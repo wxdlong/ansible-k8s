@@ -1,0 +1,55 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: "172.17.55.115,fc00::24"
+  bindPort: 6443
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+  taints:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  kubeletExtraArgs:
+    feature-gates: IPv6DualStack=true
+    node-ip: "172.17.55.115,fc00::24"
+
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+apiServer:
+  extraArgs:
+    bind-address: "::"
+  timeoutForControlPlane: 4m0s
+
+scheduler:
+  extraArgs:
+    address: 0.0.0.0
+clusterName: kubernetes
+#controlPlaneEndpoint: "172.17.55.115:6443,[fc00::24]:6443"
+
+controllerManager:
+   extraArgs:
+     bind-address: "::"
+     feature-gates: "IPv6DualStack=true"
+    #  service-cluster-ip-range: fd03::/120
+    #  cluster-cidr: "fd04::/120"
+     node-cidr-mask-size-ipv6: "120"
+
+featureGates: 
+  IPv6DualStack: true
+kubernetesVersion: v1.17.4
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: "192.167.0.0/16,fd03::/120"
+  podSubnet: "192.168.0.0/16,fd04::/120"
+
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+failSwapOn: false
+featureGates:
+  IPv6DualStack: true
+
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: "ipvs"
