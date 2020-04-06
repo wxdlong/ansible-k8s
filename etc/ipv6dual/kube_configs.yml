@@ -23,7 +23,7 @@ apiServer:
 
 scheduler:
   extraArgs:
-    address: 0.0.0.0
+    address: "::"
 clusterName: kubernetes
 #controlPlaneEndpoint: "172.17.55.115:6443,[fc00::24]:6443"
 
@@ -34,6 +34,7 @@ controllerManager:
     #  service-cluster-ip-range: fd03::/120
     #  cluster-cidr: "fd04::/120"
      node-cidr-mask-size-ipv6: "120"
+     node-cidr-mask-size-ipv4: "20"
 
 featureGates: 
   IPv6DualStack: true
